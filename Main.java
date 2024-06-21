@@ -1,9 +1,7 @@
-import java.io.IOException;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Scanner;
-import java.io.FileWriter;
 
 class Book {
     private String title;
@@ -23,6 +21,14 @@ class Book {
     @Override
     public String toString() {
         return String.format("%s, por %s (%d)", title, author, release);
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public int getRelease() {
+        return release;
     }
 }
 
@@ -120,9 +126,14 @@ class Grafo {
 
 }
 
+
+
 public class Main {
     public static void main(String[] args) {
         Grafo grafoBooks = new Grafo();
+        NavigationHistory navigationHistory = new NavigationHistory();
+        Waitlist waitlist = new Waitlist();
+
         grafoBooks.addBook(new Book("Uma Trilha Sonora para o Final dos Tempos", "Anthony Marra", 2018));
         grafoBooks.addBook(new Book("Sapiens - Uma Breve História da Humanidade", "Yuval Harari", 2011));
         grafoBooks.addBook(new Book("Gula - O Clube dos Anjos", "Luis Fernando Verissimo", 1998));
@@ -148,7 +159,6 @@ public class Main {
         grafoBooks.addBook(new Book("21 Lições para o Século 21", "Yuval Harari", 2018));
         grafoBooks.addBook(new Book("Rebelde (Vol. 1 As crônicas de Starbuck)", " Bernard Cornwell", 2014));
 
-
         grafoBooks.addRecommendation("Sapiens - Uma Breve História da Humanidade", "Crash uma Breve História da Economia", "Ansiedade O Mal do Século");
         grafoBooks.addRecommendation("Uma Trilha Sonora para o Final dos Tempos", "Assassinato no Expresso Oriente", "Sherlock Holmes: Um Estudo em Vermelho");
         grafoBooks.addRecommendation("Ansiedade O Mal do Século", "Antifrágil", "O Poder do Hábito");
@@ -170,10 +180,38 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Digite o título do livro para iniciar a leitura:");
         String tituloInicial = scanner.nextLine();
+        
+        Book initialBook = grafoBooks.findBookByTitle(tituloInicial);
+        if (initialBook != null) {
+            navigationHistory.push(initialBook);
+            grafoBooks.imprimirRamoDaArvore(tituloInicial);
+        } else {
+            System.out.println("Livro não encontrado.");
+        }
 
-        grafoBooks.imprimirRamoDaArvore(tituloInicial);
+        System.out.println("\nHistórico de navegação:");
+        navigationHistory.printHistory();
+        
+        System.out.println("\nDigite seu nome para adicionar à lista de espera de um livro:");
+        String userName = scanner.nextLine();
+        System.out.println("Digite o título do livro que deseja adicionar à lista de espera:");
+        String waitlistBookTitle = scanner.nextLine();
+        
+        Book waitlistBook = grafoBooks.findBookByTitle(waitlistBookTitle);
+        if (waitlistBook != null) {
+            waitlist.addToWaitlist(userName, waitlistBook);
+        } else {
+            System.out.println("Livro não encontrado.");
+        }
+
+        System.out.println("\nLista de espera:");
+        waitlist.printWaitlist();
 
         scanner.close();
-
     }
 }
+
+
+
+
+
