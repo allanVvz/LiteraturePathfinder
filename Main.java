@@ -1,132 +1,4 @@
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-
-class Book {
-    private String title;
-    private String author;
-    private int release;
-
-    public Book(String title, String author, int release) {
-        this.title = title;
-        this.author = author;
-        this.release = release;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s, por %s (%d)", title, author, release);
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public int getRelease() {
-        return release;
-    }
-}
-
-class Grafo {
-    private ArrayList<Book> books;
-    private HashMap<Book, LinkedList<Book>> recommendations;
-
-    public Grafo() {
-        books = new ArrayList<>();
-        recommendations = new HashMap<>();
-    }
-
-    public void addBook(Book book) {
-        books.add(book);
-        recommendations.put(book, new LinkedList<>());
-    }
-
-    public Book findBookByTitle(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                return book;
-            }
-        }
-        return null;
-    }
-
-    public void addRecommendation(String targetTitle, String recommendationOneTitle, String recommendationTwoTitle) {
-        Book target = findBookByTitle(targetTitle);
-        Book recommendationOne = findBookByTitle(recommendationOneTitle);
-        Book recommendationTwo = findBookByTitle(recommendationTwoTitle);
-
-        if (target != null && recommendationOne != null && recommendationTwo != null) {
-            LinkedList<Book> targetRecommendations = recommendations.getOrDefault(target, new LinkedList<>());
-            targetRecommendations.add(recommendationOne);
-            targetRecommendations.add(recommendationTwo);
-            recommendations.put(target, targetRecommendations);
-
-            LinkedList<Book> recommendationOneList = recommendations.getOrDefault(recommendationOne, new LinkedList<>());
-            recommendationOneList.add(target);
-            recommendations.put(recommendationOne, recommendationOneList);
-
-            LinkedList<Book> recommendationTwoList = recommendations.getOrDefault(recommendationTwo, new LinkedList<>());
-            recommendationTwoList.add(target);
-            recommendations.put(recommendationTwo, recommendationTwoList);
-        }
-    }
-
-    public void imprimirGrafo() {
-        for (Book book : books) {
-            System.out.println("\nLivro: " + book);
-            System.out.print("Recomendações: ");
-
-            LinkedList<Book> recommendationList = recommendations.getOrDefault(book, new LinkedList<>());
-            for (int j = 0; j < recommendationList.size(); j++) {
-                System.out.print(recommendationList.get(j));
-                if (j < recommendationList.size() - 1) {
-                    System.out.print(", ");
-                }
-            }
-            System.out.println();
-        }
-    }
-
-    public void imprimirGrafoComoArvore() {
-        for (Book book : books) {
-            imprimirLivroComRecomendacoes(book, 0, new ArrayList<>());
-        }
-    }
-
-    private void imprimirLivroComRecomendacoes(Book book, int nivel, ArrayList<Book> visitados) {
-        if (visitados.contains(book)) {
-            return;
-        }
-        visitados.add(book);
-
-        for (int i = 0; i < nivel; i++) {
-            System.out.print("  ");
-        }
-        System.out.println(book);
-
-        LinkedList<Book> recommendationList = recommendations.getOrDefault(book, new LinkedList<>());
-        for (Book recommendation : recommendationList) {
-            imprimirLivroComRecomendacoes(recommendation, nivel + 1, visitados);
-        }
-    }
-
-    public void imprimirRamoDaArvore(String tituloInicial) {
-        Book livroInicial = findBookByTitle(tituloInicial);
-        if (livroInicial != null) {
-            imprimirLivroComRecomendacoes(livroInicial, 0, new ArrayList<>());
-        } else {
-            System.out.println("Livro não encontrado.");
-        }
-    }
-
-}
-
-
 
 public class Main {
     public static void main(String[] args) {
@@ -175,43 +47,66 @@ public class Main {
         
         System.out.println("SISTEMA DE RECOMENDAÇÃO DE LITERATURAS");
 
-        grafoBooks.imprimirGrafo(); 
-        
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o título do livro para iniciar a leitura:");
-        String tituloInicial = scanner.nextLine();
-        
-        Book initialBook = grafoBooks.findBookByTitle(tituloInicial);
-        if (initialBook != null) {
-            navigationHistory.push(initialBook);
-            grafoBooks.imprimirRamoDaArvore(tituloInicial);
-        } else {
-            System.out.println("Livro não encontrado.");
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\nMenu de Seleção:");
+            System.out.println("1. Imprimir Grafo");
+            System.out.println("2. Imprimir Grafo Como Árvore");
+            System.out.println("3. Imprimir Ramo da Árvore");
+            System.out.println("4. Imprimir Recomendações por Distância");
+            System.out.println("5. Exibir Histórico de Navegação");
+            System.out.println("6. Adicionar à Lista de Espera");
+            System.out.println("7. Imprimir Lista de Espera");
+            System.out.println("0. Sair");
+            System.out.print("Selecione uma opção: ");
+            int option = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (option) {
+                case 1:
+                    grafoBooks.imprimirGrafo();
+                    break;
+                case 2:
+                    grafoBooks.imprimirGrafoComoArvore();
+                    break;
+                case 3:
+                    System.out.print("Digite o título inicial: ");
+                    String tituloInicial = scanner.nextLine();
+                    grafoBooks.imprimirRamoDaArvore(tituloInicial);
+                    break;
+                case 4:
+                    System.out.print("Digite o título inicial: ");
+                    tituloInicial = scanner.nextLine();
+                    grafoBooks.imprimirRecomendacoesPorDistancia(tituloInicial);
+                    break;
+                case 5:
+                    navigationHistory.printHistory();
+                    break;
+                case 6:
+                    System.out.print("Digite o nome do usuário: ");
+                    String userName = scanner.nextLine();
+                    System.out.print("Digite o título do livro: ");
+                    String bookTitle = scanner.nextLine();
+                    Book book = grafoBooks.findBookByTitle(bookTitle);
+                    if (book != null) {
+                        waitlist.addToWaitlist(userName, book);
+                    } else {
+                        System.out.println("Livro não encontrado.");
+                    }
+                    break;
+                case 7:
+                    waitlist.printWaitlist();
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+                    break;
+            }
         }
-
-        System.out.println("\nHistórico de navegação:");
-        navigationHistory.printHistory();
-        
-        System.out.println("\nDigite seu nome para adicionar à lista de espera de um livro:");
-        String userName = scanner.nextLine();
-        System.out.println("Digite o título do livro que deseja adicionar à lista de espera:");
-        String waitlistBookTitle = scanner.nextLine();
-        
-        Book waitlistBook = grafoBooks.findBookByTitle(waitlistBookTitle);
-        if (waitlistBook != null) {
-            waitlist.addToWaitlist(userName, waitlistBook);
-        } else {
-            System.out.println("Livro não encontrado.");
-        }
-
-        System.out.println("\nLista de espera:");
-        waitlist.printWaitlist();
-
         scanner.close();
     }
 }
-
-
-
-
-
