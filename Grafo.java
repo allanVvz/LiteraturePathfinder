@@ -1,6 +1,9 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 class Grafo {
@@ -125,21 +128,29 @@ class Grafo {
         return distances;
     }
 
-    public void imprimirRecomendacoesPorDistancia(String tituloInicial) {
+        public void imprimirRecomendacoesPorDistancia(String tituloInicial) {
         Book livroInicial = findBookByTitle(tituloInicial);
         if (livroInicial != null) {
             HashMap<Book, Integer> distances = dijkstra(livroInicial);
+            
+            // Ordena as recomendações por ordem crescente de distância
+            List<Map.Entry<Book, Integer>> sortedDistances = new ArrayList<>(distances.entrySet());
+            sortedDistances.sort(Comparator.comparingInt(Map.Entry::getValue));
+            
             System.out.println("\nRecomendações com base na menor distância a partir de \"" + livroInicial.getTitle() + "\":");
-            for (Book book : distances.keySet()) {
+            for (Map.Entry<Book, Integer> entry : sortedDistances) {
+                Book book = entry.getKey();
+                int distance = entry.getValue();
+                
                 if (!book.equals(livroInicial)) {
-                    System.out.println(book + " - Distância: " + distances.get(book));
+                    System.out.println(book + " - Distância: " + distance);
                 }
             }
         } else {
             System.out.println("Livro não encontrado.");
         }
     }
-    
+   
     private class BookDistancePair implements Comparable<BookDistancePair> {
         Book book;
         int distance;

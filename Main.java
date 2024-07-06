@@ -74,12 +74,24 @@ public class Main {
                 case 3:
                     System.out.print("Digite o título inicial: ");
                     String tituloInicial = scanner.nextLine();
-                    grafoBooks.imprimirRamoDaArvore(tituloInicial);
+                    Book initialBook = grafoBooks.findBookByTitle(tituloInicial);
+                    if (initialBook != null) {
+                        navigationHistory.push(initialBook);
+                        grafoBooks.imprimirRamoDaArvore(tituloInicial);
+                    } else {
+                        System.out.println("Livro não encontrado.");
+                    }
                     break;
                 case 4:
                     System.out.print("Digite o título inicial: ");
                     tituloInicial = scanner.nextLine();
-                    grafoBooks.imprimirRecomendacoesPorDistancia(tituloInicial);
+                    initialBook = grafoBooks.findBookByTitle(tituloInicial);
+                    if (initialBook != null) {
+                        navigationHistory.push(initialBook);
+                        grafoBooks.imprimirRecomendacoesPorDistancia(tituloInicial);
+                    } else {
+                        System.out.println("Livro não encontrado.");
+                    }
                     break;
                 case 5:
                     navigationHistory.printHistory();
