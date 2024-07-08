@@ -52,7 +52,7 @@ public class Main {
 
         while (running) {
             System.out.println("\nMenu de Seleção:");
-            System.out.println("1. Imprimir Grafo");
+            System.out.println("1. Imprimir livros");
             System.out.println("2. Imprimir Grafo Como Árvore");
             System.out.println("3. Imprimir Ramo da Árvore");
             System.out.println("4. Imprimir Recomendações por Distância");
